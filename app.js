@@ -37,20 +37,46 @@ document.addEventListener('DOMContentLoaded', () => {
 function initAudio() {
   bgMusic = document.getElementById('bg-music');
   bgMusic.volume = 0.65;
+  let lastVolume = 0.65;
 
   const volumeSlider = document.getElementById('volume-slider');
-  volumeSlider.addEventListener('input', (e) => {
-    const vol = parseFloat(e.target.value);
-    bgMusic.volume = vol;
-    const volIcon = document.getElementById('volume-icon');
-    if (vol === 0) {
+  const volIcon = document.getElementById('volume-icon');
+  const volumeToggleBtn = document.getElementById('volume-toggle-btn');
+
+  function updateVolumeIcon(vol, isMuted) {
+    if (isMuted || vol === 0) {
       volIcon.className = 'fas fa-volume-mute';
     } else if (vol < 0.5) {
       volIcon.className = 'fas fa-volume-down';
     } else {
       volIcon.className = 'fas fa-volume-up';
     }
+  }
+
+  volumeSlider.addEventListener('input', (e) => {
+    const vol = parseFloat(e.target.value);
+    bgMusic.volume = vol;
+    bgMusic.muted = (vol === 0);
+    if (vol > 0) lastVolume = vol;
+    updateVolumeIcon(vol, bgMusic.muted);
   });
+
+  if (volumeToggleBtn) {
+    volumeToggleBtn.addEventListener('click', () => {
+      if (bgMusic.muted || bgMusic.volume === 0) {
+        bgMusic.muted = false;
+        bgMusic.volume = lastVolume > 0 ? lastVolume : 0.65;
+        volumeSlider.value = bgMusic.volume;
+        updateVolumeIcon(bgMusic.volume, false);
+      } else {
+        lastVolume = bgMusic.volume;
+        bgMusic.muted = true;
+        bgMusic.volume = 0;
+        volumeSlider.value = 0;
+        updateVolumeIcon(0, true);
+      }
+    });
+  }
 
   const customMusicInput = document.getElementById('custom-music-input');
   customMusicInput.addEventListener('change', (e) => {
@@ -160,6 +186,50 @@ function initControls() {
     document.getElementById('custom-music-input').click();
   });
 
+  // Tap en visor de fotos para pausar/reanudar
+  const mediaViewport = document.getElementById('media-viewport');
+  mediaViewport.addEventListener('click', (e) => {
+    if (e.target.tagName === 'VIDEO') return;
+    if (isPlaying) {
+      pauseSlideshow();
+    } else {
+      startSlideshow();
+    }
+  });
+
+  // Soporte de gestos táctiles (Swipe) en móviles y tablets
+  const stage = document.querySelector('.stage-container');
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartTime = 0;
+
+  stage.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchStartTime = Date.now();
+    }
+  }, { passive: true });
+
+  stage.addEventListener('touchend', (e) => {
+    if (e.changedTouches.length === 1) {
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndY = e.changedTouches[0].clientY;
+      const diffX = touchEndX - touchStartX;
+      const diffY = touchEndY - touchStartY;
+      const elapsed = Date.now() - touchStartTime;
+
+      // Detectar swipe horizontal claro (> 40px y más horizontal que vertical en menos de 500ms)
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40 && elapsed < 500) {
+        if (diffX < 0) {
+          nextSlide(); // Deslizar hacia la izquierda -> siguiente
+        } else {
+          prevSlide(); // Deslizar hacia la derecha -> anterior
+        }
+      }
+    }
+  }, { passive: true });
+
   // Poblado del selector de capítulos
   populateChapters();
 }
@@ -255,6 +325,12 @@ function renderSlide(index, animate = true) {
     }, 400);
   } else {
     applySlideContent(slide);
+  }
+
+  // En dispositivos móviles, reiniciar el scroll vertical del contenedor
+  const stageElem = document.querySelector('.stage-container');
+  if (stageElem && stageElem.scrollTop > 0) {
+    stageElem.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // Actualizar Timeline
@@ -435,7 +511,7 @@ function initParticles() {
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
 
-  const particleCount = 45;
+  const particleCount = window.innerWidth <= 768 ? 22 : 45;
   particles = [];
   for (let i = 0; i < particleCount; i++) {
     particles.push({
