@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nuestra Historia de Amor · ¡Vamos a ser Papás!</title>
+  <meta name="description" content="Reportaje audiovisual interactivo y emotivo: de nuestro primer encuentro en 2015 al 15 de septiembre de 2026. ¡Vamos a ser papás!" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- CSS Principal -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Fondo ambiental difuminado dinámico -->
+  <div id="ambient-backdrop"></div>
+  <div class="ambient-overlay"></div>
+
+  <!-- Lienzo de partículas de polvo dorado -->
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- Barra Superior -->
+  <header class="top-nav">
+    <div class="story-brand">
+      <span class="brand-heart"><i class="fas fa-heart"></i></span>
+      <div>
+        <div class="brand-title">Nuestra Historia de Amor</div>
+        <div class="brand-names">De 2015 a 2026 · El Milagro de la Vida</div>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <!-- Selector de música personalizada -->
+      <button class="action-btn" id="change-music-btn" title="Elegir tu propia canción">
+        <i class="fas fa-music"></i>
+        <span>Cambiar Canción</span>
+      </button>
+      <input type="file" id="custom-music-input" accept="audio/*" style="display:none;" />
+
+      <!-- Pantalla Completa -->
+      <button class="action-btn" id="fullscreen-btn" title="Pantalla Completa (F)">
+        <i class="fas fa-expand" id="fullscreen-icon"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Escenario Principal del Reportaje -->
+  <main class="stage-container">
+    <div class="slide-wrapper" id="slide-wrapper">
+      
+      <!-- Contenedor Visual (Fotos / Videos / Collages) -->
+      <div class="media-viewport" id="media-viewport">
+        <!-- Renderizado dinámico desde app.js -->
+      </div>
+
+      <!-- Tarjeta Narrativa y Emocional -->
+      <article class="story-card" id="story-card">
+        <div class="chapter-pill">
+          <i class="fas fa-bookmark"></i>
+          <span id="chapter-name">Donde Todo Comenzó</span>
+        </div>
+        
+        <div class="date-badge" id="date-badge">18 de Enero de 2015</div>
+        <h1 class="story-title" id="story-title">La noche que cambió nuestras vidas</h1>
+        <h2 class="story-subtitle" id="story-subtitle">Córdoba · El origen de todo</h2>
+        
+        <div class="story-divider"></div>
+        
+        <p class="story-text" id="story-text">
+          Aquella noche del 18 de enero de 2015 en Córdoba, entre miradas cómplices, risas y una bachata dulce, supimos que estábamos hechos el uno para el otro. El 20 de enero empezó la aventura más bonita de nuestras vidas...
+        </p>
+
+        <div class="closing-quote" id="closing-quote" style="display: none;">
+          « Un largo camino que sigue con una nueva vida fruto de nuestro amor »
+        </div>
+
+        <div class="slide-counter" id="slide-num">1 / 56</div>
+      </article>
+
+    </div>
+  </main>
+
+  <!-- Muelle Inferior de Control Cinematográfico -->
+  <footer class="bottom-dock">
+    
+    <!-- Controles de Reproducción -->
+    <div class="controls-group">
+      <button class="ctrl-btn" id="prev-btn" title="Anterior (Flecha Izq)">
+        <i class="fas fa-step-backward"></i>
+      </button>
+      
+      <button class="ctrl-btn play-pause-btn" id="play-pause-btn" title="Reproducir / Pausa (Espacio)">
+        <i class="fas fa-play" id="play-icon"></i>
+      </button>
+      
+      <button class="ctrl-btn" id="next-btn" title="Siguiente (Flecha Der)">
+        <i class="fas fa-step-forward"></i>
+      </button>
+    </div>
+
+    <!-- Barra de Tiempo y Progreso -->
+    <div class="timeline-slider-wrap">
+      <div class="timeline-progress-bar" id="timeline-progress">
+        <div class="timeline-fill" id="timeline-fill"></div>
+      </div>
+      <div class="timeline-meta">
+        <span id="current-time-text">2015 · Córdoba</span>
+        <span id="total-slides-hint">56 Capítulos</span>
+      </div>
+    </div>
+
+    <!-- Selector de Capítulos / Años -->
+    <select class="chapter-select" id="chapter-select" title="Saltar a Año / Capítulo">
+      <!-- Opciones autogeneradas -->
+    </select>
+
+    <!-- Velocidad -->
+    <button class="speed-btn" id="speed-btn" title="Velocidad del pase">Normal (12s)</button>
+
+    <!-- Control de Volumen y Música -->
+    <div class="music-badge" title="Banda sonora">
+      <span class="music-disc paused"><i class="fas fa-compact-disc"></i></span>
+      <span id="music-title">MusicaVideo</span>
+    </div>
+
+    <div class="volume-control">
+      <i class="fas fa-volume-up" id="volume-icon" style="font-size: 0.85rem; color: var(--gold);"></i>
+      <input type="range" class="volume-slider" id="volume-slider" min="0" max="1" step="0.05" value="0.65" title="Volumen de Música" />
+    </div>
+
+  </footer>
+
+  <!-- Modal Inicial de Bienvenida -->
+  <div class="modal-overlay" id="welcome-modal">
+    <div class="welcome-box">
+      <div class="welcome-heart"><i class="fas fa-heart"></i></div>
+      <h1>Nuestra Historia de Amor</h1>
+      <div class="welcome-tagline">El camino que nos trajo hasta ti</div>
+      <p>
+        Un viaje a través de los momentos más bonitos que hemos vivido juntos, nuestros sueños, nuestras luchas y la revelación más especial: ¡Querida familia, vamos a ser papás!
+      </p>
+      <button class="start-btn" id="start-btn">
+        <i class="fas fa-play"></i>
+        <span>Comenzar Reportaje</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Audio Element -->
+  <audio id="bg-music" src="Musica/MusicaVideo.mp3" loop preload="auto"></audio>
+
+  <!-- Scripts -->
+  <script src="slides_data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
